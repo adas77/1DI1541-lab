@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script>
+      let l = []
+      
+      window.addEventListener('load', () => {
+        fetch('/api/user/get')
+          .then((response) => response.json())
+          .then((data) => l.push(data.email))
+      })
+      const list = document.getElementById('x')
+      l.forEach((x) => {
+        const el = document.createElement('div')
+        el.append(x)
+        list.appendChild(el)
+      })
+    </script>
+  </head>
+
+  <body>
+    <p>Hello</p>
+    <div id="x"></div>
+  </body>
+</html>
