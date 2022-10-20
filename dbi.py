@@ -11,6 +11,9 @@ class Database:
         conn = sqlite3.connect(self.filename)
         return conn
 
+
+# user
+
     def user_create(self):
         try:
             conn = self.__connect_to_db()
@@ -112,3 +115,80 @@ class Database:
             users = []
 
         return users
+
+# product
+    def product_create(self):
+        try:
+            conn = self.__connect_to_db()
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS product (product_id INTEGER PRIMARY KEY NOT NULL,img TEXT NOT NULL, price DECIMAL(10,2) NOT NULL, quantity INTEGER NOT NULL, description TEXT,  reg_date timestamp)")
+            conn.commit()
+            print("product table created successfully")
+        except:
+            print("product table creation failed")
+        finally:
+            conn.close()
+
+    def product_insert(self, product):
+        inserted_product = {}
+        try:
+            conn = self.__connect_to_db()
+            cur = conn.cursor()
+            cur.execute("INSERT INTO product (img, price, quantity, description,reg_date) values (?, ?, ?, ?, ?)",
+                        (product['img'], product['price'], product['quantity'], product['description'], datetime.now()))
+            conn.commit()
+            inserted_product = self.product_get_by_id(cur.lastrowid)
+            print(inserted_product)
+
+        except:
+            conn.rollback()
+
+        finally:
+            conn.close()
+
+        return inserted_product
+
+    def product_get_by_id(self, product_id):
+        product = {}
+        try:
+            conn = self.__connect_to_db()
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM product WHERE product_id = ?",
+                        (product_id,))
+            row = cur.fetchone()
+            # "CREATE TABLE IF NOT EXISTS product (product_id INTEGER PRIMARY KEY NOT NULL,img TEXT NOT NULL, price DECIMAL(10,2) NOT NULL, quantity INTEGER NOT NULL, description TEXT,  reg_date timestamp)"
+            product["product_id"] = row["product_id"]
+            product["img"] = row["img"]
+            product["price"] = row["price"]
+            product["quantity"] = row["quantity"]
+            product["description"] = row["description"]
+            product["reg_date"] = row["reg_date"]
+        except:
+            product = {}
+        return product
+
+    def products_get(self):
+        products = []
+        try:
+            conn = self.__connect_to_db()
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM product")
+            rows = cur.fetchall()
+            for i in rows:
+                product = {}
+
+                product["product_id"] = i["product_id"]
+                product["img"] = i["img"]
+                product["price"] = i["price"]
+                product["quantity"] = i["quantity"]
+                product["description"] = i["description"]
+                product["reg_date"] = i["reg_date"]
+
+                products.append(product)
+
+        except:
+            products = []
+
+        return products

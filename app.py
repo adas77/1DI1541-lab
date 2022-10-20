@@ -19,10 +19,17 @@ API_USER_UPDATE = os.getenv('API_USER_UPDATE')
 API_USER_DELETE = os.getenv('API_USER_DELETE')
 
 
+API_PRODUCT_GET = os.getenv('API_PRODUCT_GET')
+API_PRODUCT_CREATE = os.getenv('API_PRODUCT_CREATE')
+API_PRODUCT_UPDATE = os.getenv('API_PRODUCT_UPDATE')
+API_PRODUCT_DELETE = os.getenv('API_PRODUCT_DELETE')
+
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 db = dbi.Database(DB_PATH)
 db.user_create()
+db.product_create()
 
 
 def token_required(f):
@@ -63,6 +70,11 @@ def dashboard():
     return render_template('dashboard.html')
 
 
+@app.route('/product')
+def product():
+    return render_template('product.html')
+
+
 @app.route(API_USER_LOGIN, methods=['POST'])
 def handle_login():
     print("hello there")
@@ -101,6 +113,22 @@ def api_users_get():
 @app.route(API_USER_CREATE, methods=['POST'])
 def api_user_create():
     return jsonify(db.user_insert(request.get_json()))
+
+
+@app.route(API_PRODUCT_GET+"/<product_id>", methods=['GET'])
+def api_product_get(product_id):
+    return jsonify(db.product_get_by_id(product_id))
+
+
+@app.route(API_PRODUCT_GET, methods=['GET'])
+def api_products_get():
+    return jsonify(db.products_get())
+
+
+@app.route(API_PRODUCT_CREATE, methods=['POST'])
+def api_product_create():
+    print(request.get_json())
+    return jsonify(db.product_insert(request.get_json()))
 
 
 if __name__ == "__main__":

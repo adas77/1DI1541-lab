@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product</title>
+    <script>
+
+        const handleButton=(e)=>{
+            e.preventDefault()
+        };
+
+      window.addEventListener('load', () => {
+        fetch('/api/product/get')
+          .then((response) => response.json())
+          .then((data) => {
+            data.forEach((u) => {
+              let f = u.img
+              console.log(f)
+
+              const img = `<img
+              src="static/${u.img}"
+              alt="${u.img}"
+              width="400"
+              height="341"
+              title="${u.img}" />`
+            
+              const l = ` <tr>
+                    <td>${u.product_id}</td>
+                    <td>${img}</td>
+                    <td>${u.price}ZŁ/KG</td>
+                    <td>${u.quantity}</td>
+                    <td>${u.description}</td>
+                    <td>${u.reg_date}</td>
+                    <td><button>dodaj do koszyka</button></td>
+                  </tr>`
+              document.querySelector('table').insertAdjacentHTML('beforeend', l)
+            })
+          })
+          .catch((err) => console.log(err))
+      })
+    </script>
+  </head>
+
+  <body>
+    <table>
+      <tr>
+        <th>id</th>
+        <th>img</th>
+        <th>price</th>
+        <th>quantity</th>
+        <th>description</th>
+        <th>date</th>
+      </tr>
+    </table>
+    <td>
+      <img src="{{ url_for('static', filename = 'japko.jpg') }}" align="middle" />
+    </td>
+  </body>
+</html>
