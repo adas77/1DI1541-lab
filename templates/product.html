@@ -6,8 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product</title>
     <script>
+      const products=[];
 
-        const handleButton=(e)=>{
+      search = (val) => {
+      const searchDiv = document.getElementById('search')
+      while(searchDiv.firstChild){
+        searchDiv.removeChild(searchDiv.firstChild);
+        }
+        products.forEach(p=>{
+          if(p.img.includes(val)&& val.length>0){
+            console.log(p)
+            
+            const img = `<img
+              src="static/${p.img}"
+              alt="${p.img}"
+              width="40"
+              height="34"
+              title="${p.img}" />`
+              searchDiv.insertAdjacentHTML('afterbegin', img)
+          }
+        });
+
+      }
+
+        const handleButton=()=>{
             e.preventDefault()
         };
 
@@ -16,6 +38,8 @@
           .then((response) => response.json())
           .then((data) => {
             data.forEach((u) => {
+              products.push({img:u.img,price:u.price,quantity:u.quantity})
+              console.log(products)
               let f = u.img
               console.log(f)
 
@@ -26,6 +50,7 @@
               height="341"
               title="${u.img}" />`
             
+              //<img src="{{ url_for('static', filename = 'japko.jpg') }}" align="middle" />
               const l = ` <tr>
                     <td>${u.product_id}</td>
                     <td>${img}</td>
@@ -44,6 +69,9 @@
   </head>
 
   <body>
+    <input type="text" id="in" oninput="search(this.value)" />
+    <div id="search"></div>
+
     <table>
       <tr>
         <th>id</th>
@@ -55,7 +83,7 @@
       </tr>
     </table>
     <td>
-      <img src="{{ url_for('static', filename = 'japko.jpg') }}" align="middle" />
+      
     </td>
   </body>
 </html>

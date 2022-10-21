@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sklep internetowy</title>
+    <script>
+      search = (val) => {
+        var t = document.getElementById('t').innerHTML
+        let nextOcc = t.indexOf(val)
+      
+        while (t.indexOf(val, nextOcc) != -1 && val.length > 0) {
+          console.log(`The index of the  "${val}" is ${t.indexOf(val, nextOcc)}`)
+          nextOcc += 1
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <p>Hello</p>
+    <input type="text" id="in" oninput="search(this.value)" />
+    <div id="t">oeibowefb fenfnoiwefnowefn feefbooew oewfi fenfnoiwefnowefn feefbooew oewfionodiji pqv qo oqwviowvqw qf uq fiqwf
+
+      fenfnoiwefnowefn feefbooew oewfionodiji pqv qo oqwviowvqw qf uq fiqwf
+
+      fenfnoiwefnowefn feefbooew oewfionodiji pqv qo oqwviowvqw qf uq fiqwf
+
+      fenfnoiwefnowefn feefbooew oewfionodiji pqv qo oqwviowvqw qf uq fiqwf onodiji pqv qo oqwviowvqw qf uq fiqwf</div>
+  </body>
+</html>

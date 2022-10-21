@@ -65,6 +65,11 @@ def welcome():
     return render_template('welcome.html')
 
 
+@app.route('/search')
+def search():
+    return render_template('search.html')
+
+
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
