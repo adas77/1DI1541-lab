@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product</title>
     <script>
-      const products=[];
-
+      const products=new Map()
+      const basket=new Map()
       search = (val) => {
       const searchDiv = document.getElementById('search')
       while(searchDiv.firstChild){
@@ -20,8 +20,8 @@
             const img = `<img
               src="static/${p.img}"
               alt="${p.img}"
-              width="40"
-              height="34"
+              width="80"
+              height="70"
               title="${p.img}" />`
               searchDiv.insertAdjacentHTML('afterbegin', img)
           }
@@ -29,19 +29,70 @@
 
       }
 
-        const handleButton=()=>{
-            e.preventDefault()
+        const handleButton=($this)=>{
+          letval = $this.previousElementSibling.value;
+
+            console.log("button pressed")
+            if(val == ''){
+              console.log('no input');
+          }else{
+             console.log(val);
+          }
         };
 
+        const getQuantity=(quantity,product_id,price)=>{
+          if(event.key==="Enter" && quantity>0){
+            const basketDiv = document.getElementById('basket')
+            const basketSumDiv = document.getElementById('basket-sum')
+            while(basketDiv.firstChild){
+              basketDiv.removeChild(basketDiv.firstChild);
+              }
+
+            basket.set(product_id,quantity)
+              //const product = products.get(product_id);
+              //console.log(`product:${product.}`)
+
+              let sum=0;
+            basket.forEach((value,key)=>{
+              const product = products.get(key);
+
+              const img = `<img
+              src="static/${product.img}"
+              alt="${product.img}"
+              width="400"
+              height="341"
+              title="${product.img}" />`
+
+              const be = ` <tr>
+                <td>${key}</td>
+                <td>${value}</td>
+                <td>${product.price}</td>
+                <td>${img}</td>
+                <td><button onclick="delete(this)">usun</button></td>
+              </tr>`
+
+              basketDiv.insertAdjacentHTML('beforeend', be)
+              sum+=product.price*value
+            })
+            basketSumDiv.innerHTML=sum
+          }
+
+        }
+
       window.addEventListener('load', () => {
+
+        basket.forEach(b=>{
+          console.log(b)
+        })
+
         fetch('/api/product/get')
           .then((response) => response.json())
           .then((data) => {
             data.forEach((u) => {
-              products.push({img:u.img,price:u.price,quantity:u.quantity})
+              products.set(u.product_id,{img:u.img,price:u.price,quantity:u.quantity})
+              //products.push({img:u.img,price:u.price,quantity:u.quantity})
               console.log(products)
-              let f = u.img
-              console.log(f)
+              
 
               const img = `<img
               src="static/${u.img}"
@@ -58,7 +109,8 @@
                     <td>${u.quantity}</td>
                     <td>${u.description}</td>
                     <td>${u.reg_date}</td>
-                    <td><button>dodaj do koszyka</button></td>
+                    <td><button onclick="handleButton(this)">dodaj do koszyka</button></td>
+                    <td><input  onkeydown="getQuantity(this.value,${u.product_id},${u.price})" type="number" placeholder="sztuk" value=0></td>
                   </tr>`
               document.querySelector('table').insertAdjacentHTML('beforeend', l)
             })
@@ -71,7 +123,10 @@
   <body>
     <input type="text" id="in" oninput="search(this.value)" />
     <div id="search"></div>
-
+    <form action="" >
+      <input type="number" name="quantity" id="quantity-basked">
+      <input type="submit" value="wyślij" />
+    </form>
     <table>
       <tr>
         <th>id</th>
@@ -82,8 +137,16 @@
         <th>date</th>
       </tr>
     </table>
-    <td>
-      
-    </td>
+    <table id="basket">
+      <tr>
+        <th>id</th>
+        <th>quantity</th>
+        <th>price</th>
+        <th>img</th>
+      </tr>
+    </table>
+    <p>KWOTA:</p>
+    <p id="basket-sum"></p>
+
   </body>
 </html>

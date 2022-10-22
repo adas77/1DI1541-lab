@@ -26,11 +26,11 @@ API_PRODUCT_DELETE = os.getenv('API_PRODUCT_DELETE')
 
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SECRET_KEY'] = SECRET_KEY
 db = dbi.Database(DB_PATH)
 db.user_create()
 db.product_create()
-
 
 def token_required(f):
     @wraps(f)
@@ -79,6 +79,10 @@ def dashboard():
 def product():
     return render_template('product.html')
 
+
+# @app.route('api/product/<product_id>', methods=['GET'])
+# def handle_basket():
+#     return jsonify(request.get_json())
 
 @app.route(API_USER_LOGIN, methods=['POST'])
 def handle_login():
