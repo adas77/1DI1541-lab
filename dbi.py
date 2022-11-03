@@ -14,6 +14,7 @@ class Database:
 
 # user
 
+
     def user_create(self):
         try:
             conn = self.__connect_to_db()
@@ -59,6 +60,24 @@ class Database:
             cur = conn.cursor()
             cur.execute("SELECT * FROM user WHERE user_id = ?",
                         (user_id,))
+            row = cur.fetchone()
+            user["user_id"] = row["user_id"]
+            user["nickname"] = row["nickname"]
+            user["email"] = row["email"]
+            user["password"] = row["password"]
+            user["reg_date"] = row["reg_date"]
+        except:
+            user = {}
+        return user
+
+    def user_get_by_email(self, email):
+        user = {}
+        try:
+            conn = self.__connect_to_db()
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM user WHERE email = ?",
+                        (email,))
             row = cur.fetchone()
             user["user_id"] = row["user_id"]
             user["nickname"] = row["nickname"]
@@ -116,7 +135,58 @@ class Database:
 
         return users
 
+    # @staticmethod
+    # def __update_or_default(reg, key):
+    #     if key not in reg.keys():
+    #         reg[key] = None
+
+    def users_update(self, user_id, password):
+        updated_user = {}
+        try:
+            conn = self.__connect_to_db()
+            cur = conn.cursor()
+
+            cur.execute("UPDATE user SET password = ? WHERE user_id = ?", (
+                password, user_id
+            ))
+
+            conn.commit()
+            updated_user = self.user_get_by_id(user_id)
+            print(updated_user)
+
+        except:
+            conn.rollback()
+            updated_user = {}
+        finally:
+            conn.close()
+
+        return updated_user
+
+    def users_change_password(self, email, password):
+        updated_user = {}
+        try:
+            conn = self.__connect_to_db()
+            cur = conn.cursor()
+
+            cur.execute("UPDATE user SET password = ? WHERE email = ?", (
+                password, email
+            ))
+
+            conn.commit()
+            updated_user = self.user_get_by_email(email)
+            print(updated_user)
+
+        except:
+            conn.rollback()
+            updated_user = {}
+        finally:
+            conn.close()
+
+        return updated_user
+
+
 # product
+
     def product_create(self):
         try:
             conn = self.__connect_to_db()
