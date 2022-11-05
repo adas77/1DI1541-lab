@@ -1,14 +1,16 @@
 #!/usr/bin/python
-from crypt import methods
 from datetime import datetime, timedelta
 from functools import wraps
 from flask import Flask, jsonify, make_response, render_template, request, session
 import jwt
 import os
+from simplehaszing import hash_new_password
+
 
 import dbi
 
 SECRET_KEY = os.getenv('SECRET_KEY')
+SALT = str.encode(os.getenv('SALT'))
 
 DB_PATH = os.getenv('DB_PATH')
 
@@ -28,7 +30,6 @@ API_PRODUCT_CREATE = os.getenv('API_PRODUCT_CREATE')
 API_PRODUCT_UPDATE = os.getenv('API_PRODUCT_UPDATE')
 API_PRODUCT_DELETE = os.getenv('API_PRODUCT_DELETE')
 
-
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -40,6 +41,8 @@ db.product_create()
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        # ạdd set  token to cookie
+        # token = request.cookies.get('token')
         token = request.args.get('token')
         if not token:
             return jsonify({'message': 'Token is missing !!'}), 401
@@ -58,11 +61,20 @@ def token_required(f):
 
 @app.route('/')
 def home():
-    print(session.get('logged_in'))
-    if not session.get('logged_in'):
-        return render_template('login.html')
-    else:
-        return render_template('login.html')
+    return render_template('root.html')
+
+
+@app.route('/admin')
+# @token_required
+def admin():
+    return render_template('admin.html')
+
+
+@app.route(API_USER_DELETE,   methods=['DELETE'])
+# @token_required
+def user_delete():
+    print("xdd")
+    return jsonify(db.user_delete_all())
 
 
 @app.route('/welcome')
@@ -100,15 +112,24 @@ def product():
 #     return jsonify(request.get_json())
 
 
-@app.route(API_USER_LOGIN, methods=['POST'])
+@app.route(API_USER_LOGIN, methods=['POST', 'GET'])
 def handle_login():
+
+    print(session)
+    if 'username' in session:
+        return render_template('product.html')
+
+    if request.method == "GET":
+        return render_template("login.html")
     print("hello there")
     print(request.form)
 
     user = {
     }
     user['email'] = request.form['email']
-    user['password'] = request.form['password']
+    # user['password'] = request.form['password']
+    hashed_password = hash_new_password(request.form['password'], SALT)
+    user['password'] = hashed_password
     print(user)
     res = db.user_handle_login(user)
     print(f'res:{res}')
@@ -119,6 +140,11 @@ def handle_login():
         },
             app.config['SECRET_KEY'])
         print('token:{token}')
+        # add token to cookie
+        # res = make_response()
+        # res.set_cookie('token', token)
+        # return res
+        session['username'] = user['email']
         return jsonify({'token': token.decode('utf-8')})
     else:
         return make_response('Unable to verify', 408, {'WWW-Authenticate': 'Basic realm: "Authentication Failed "'})
@@ -132,6 +158,7 @@ def change_password():
     password = request.form.get('password')
     password_2 = request.form.get('password_2')
     data = jwt.decode(token, app.config['SECRET_KEY'])
+
     print(data)
     token_email = data['user']
     print(
@@ -139,7 +166,8 @@ def change_password():
     if (token_email != email) or (password != password_2):
         return make_response('Unable to change password', 444)
 
-    db.users_change_password(email, password)
+    hashed_password = hash_new_password(password, SALT)
+    db.users_change_password(email, hashed_password)
     return make_response(f'Password for:{email} changed', 222)
 
 
@@ -158,9 +186,18 @@ def api_users_get():
     return jsonify(db.users_get())
 
 
-@app.route(API_USER_CREATE, methods=['POST'])
+@app.route(API_USER_CREATE, methods=['POST', 'GET'])
 def api_user_create():
-    return jsonify(db.user_insert(request.get_json()))
+    if request.method == "GET":
+        return render_template("sign-up.html")
+    print(request.form['email'])
+    user = {}
+    user['email'] = request.form['email']
+    user['nickname'] = request.form['nickname']
+    hashed_password = hash_new_password(request.form['password'], SALT)
+    user['password'] = hashed_password
+    print(user)
+    return jsonify(db.user_insert(user))
 
 
 @app.route(API_PRODUCT_GET+"/<product_id>", methods=['GET'])
@@ -180,4 +217,5 @@ def api_product_create():
 
 
 if __name__ == "__main__":
+    # session.clear()
     app.run()

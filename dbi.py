@@ -15,11 +15,35 @@ class Database:
 # user
 
 
+    def user_drop(self):
+        try:
+            conn = self.__connect_to_db()
+            conn.execute(
+                "DROP TABLE user")
+            conn.commit()
+            print("user table dropped successfully")
+        except:
+            print("user table drop failed")
+        finally:
+            conn.close()
+
+    def user_delete_all(self):
+        try:
+            conn = self.__connect_to_db()
+            conn.execute(
+                "DELETE FROM user")
+            conn.commit()
+            print("user table cleared successfully")
+        except:
+            print("user table clear failed")
+        finally:
+            conn.close()
+
     def user_create(self):
         try:
             conn = self.__connect_to_db()
             conn.execute(
-                "CREATE TABLE IF NOT EXISTS user (user_id INTEGER PRIMARY KEY NOT NULL, nickname TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL, reg_date timestamp)")
+                "CREATE TABLE IF NOT EXISTS user (user_id INTEGER PRIMARY KEY NOT NULL, nickname TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password BINARY(16) NOT NULL, reg_date timestamp)")
             conn.commit()
             print("user table created successfully")
         except:
@@ -36,13 +60,14 @@ class Database:
                         (user['email'], user['nickname']))
             result = cur.fetchone()
             if result:
-                print("nickname or email already exists")
+                return "Nickname or email already exists", 444
             else:
                 cur.execute("INSERT INTO user (nickname, email, password, reg_date) values (?, ?, ?, ?)",
                             (user['nickname'], user['email'], user['password'], datetime.now()))
             conn.commit()
             inserted_user = self.user_get_by_id(cur.lastrowid)
             print(inserted_user)
+            inserted_user['password'] = 'SECRET'
 
         except:
             conn.rollback()
@@ -134,11 +159,6 @@ class Database:
             users = []
 
         return users
-
-    # @staticmethod
-    # def __update_or_default(reg, key):
-    #     if key not in reg.keys():
-    #         reg[key] = None
 
     def users_update(self, user_id, password):
         updated_user = {}
