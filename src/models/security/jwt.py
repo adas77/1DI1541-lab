@@ -30,7 +30,8 @@ def token_required(f):
             return jsonify({'message': 'Token is missing !!'}), 401
 
         try:
-            data = __decode_token()
+            data = __decode_token(session[SESSION_USER_TOKEN])
+
             if __check_token_expired(data):
                 session.pop(SESSION_USER_TOKEN, None)
                 return render_template('login.html')
@@ -52,12 +53,12 @@ def __encode_token(email):
         'email': email,
         'expiration': str(datetime.utcnow() + timedelta(seconds=TOKEN_EXPIRATION_IN_SECONDS))
     },
-        SECRET_KEY)
+        SECRET_KEY, algorithm="HS256")
     return token
 
 
-def __decode_token():
-    token = jwt.decode(session[SESSION_USER_TOKEN], SECRET_KEY)
+def __decode_token(encoded):
+    token = jwt.decode(encoded, SECRET_KEY, algorithms="HS256")
     return token
 
 
@@ -72,14 +73,6 @@ def __check_token_expired(token):
     return past < present
 
 
-# def create_token(email):
-#     token = __encode_token(email)
-#     print('token:{token}')
-#     session['email'] = email
-#     session[SESSION_USER_TOKEN] = token
-#     return jsonify({'token': token.decode('utf-8')})
-
-
 def handle_login(email, password):
     if SESSION_USER_TOKEN in session:
         return render_template('welcome.html')
@@ -91,6 +84,8 @@ def handle_login(email, password):
         token = __encode_token(email)
         session[SESSION_USER_TOKEN] = token
         session[SESSION_USER_EMAIL] = email
-        return jsonify({'token': token.decode('utf-8')})
+        print(f'encoded:{token}')
+        # return jsonify({'token': token.decode('utf-8')})
+        return jsonify({'token': token})
     else:
         return make_response('Unable to verify', 408, {'WWW-Authenticate': 'Basic realm: "Authentication Failed "'})
