@@ -3,7 +3,7 @@ import datetime
 from flask import jsonify, make_response
 from sqlalchemy import DateTime
 from .. import db
-from .security.simplehaszing import *
+# from .security.simplehaszing import *
 import os
 
 RESPONSE_ERROR_FIELD_EXIST_CODE = os.getenv('RESPONSE_ERROR_FIELD_EXIST_CODE')

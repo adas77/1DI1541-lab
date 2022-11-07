@@ -15,12 +15,16 @@ def init_app():
 
         from src.models.user import User
         from src.models.product import Product
+        from src.models.order import Order
         db.create_all()
 
         from src.routes.user import bp as user_bp
         app.register_blueprint(user_bp)
-        
+
         from src.routes.product import bp as product_bp
         app.register_blueprint(product_bp)
+
+        from src.routes.order import bp as order_bp
+        app.register_blueprint(order_bp)
 
         return app

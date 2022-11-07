@@ -8,6 +8,7 @@ API_PRODUCT_CREATE = os.getenv('API_PRODUCT_CREATE')
 API_PRODUCT_UPDATE = os.getenv('API_PRODUCT_UPDATE')
 API_PRODUCT_DELETE = os.getenv('API_PRODUCT_DELETE')
 
+
 bp = Blueprint('product', __name__)
 
 
