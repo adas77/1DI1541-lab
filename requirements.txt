@@ -2,3 +2,5 @@ flask
 pyjwt
 python-dotenv
 hashlib
+Flask-JWT
+Flask-SQLAlchemy

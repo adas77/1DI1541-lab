@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import os
 
 
 def hash_new_password(password: str, salt: bytes) -> bytes:
