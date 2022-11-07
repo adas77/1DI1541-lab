@@ -12,4 +12,4 @@ File: `.env`
 
 ## Run with Docker
 
-`./run_docker.sh`
+`sudo ./run_docker.sh`
