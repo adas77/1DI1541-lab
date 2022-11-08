@@ -1,6 +1,6 @@
 from flask import session
 from src import init_app
-from src.database.order_drop import drop
+
 
 app = init_app()
 
@@ -13,5 +13,4 @@ def clear_session_vars():
 
 if __name__ == "__main__":
     app.run()
-    drop()
     
