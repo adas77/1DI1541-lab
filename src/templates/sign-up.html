@@ -5,14 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign up</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'css/main.css') }}" />
+    <script src="{{ url_for('static', filename = 'components/nav.js') }}" type="text/javascript" defer></script>
   </head>
 
   <body>
-    <form action="/api/user/create" method="POST" id="login">
-      <input type="email" name="email" placeholder="email" id="email" />
-      <input type="text" name="nickname" placeholder="nickname" id="nickname" />
-      <input type="password" name="password" placeholder="password" id="password" />
-      <input type="submit" value="wyślij" />
-    </form>
+    <nav-component></nav-component>
+    <div class="center">
+      <form action="/api/user/create" method="POST" id="login">
+        <input type="email" name="email" placeholder="email" id="email" />
+        <input type="text" name="nickname" placeholder="nickname" id="nickname" />
+        <input type="password" name="password" placeholder="password" id="password" />
+        <input type="submit" value="wyślij" />
+      </form>
+    </div>
   </body>
 </html>

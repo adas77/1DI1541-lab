@@ -11,6 +11,10 @@ API_PRODUCT_DELETE = os.getenv('API_PRODUCT_DELETE')
 
 bp = Blueprint('product', __name__)
 
+@bp.route('/product')
+@token_required
+def product():
+    return render_template('product.html')
 
 @bp.route(API_PRODUCT_GET, methods=["GET"])
 def api_productr_get():

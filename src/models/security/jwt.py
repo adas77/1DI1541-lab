@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import jsonify, session
+from flask import jsonify, redirect, session, url_for
 
 
 from datetime import datetime, timedelta
@@ -23,7 +23,6 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         # token = request.args.get('token')
-        print(session)
         if SESSION_USER_TOKEN not in session:
             # if not token:
             return render_template('login.html')
@@ -33,7 +32,7 @@ def token_required(f):
             data = __decode_token(session[SESSION_USER_TOKEN])
 
             if __check_token_expired(data):
-                session.pop(SESSION_USER_TOKEN, None)
+                logout()
                 return render_template('login.html')
 
             if data['email'] != session[SESSION_USER_EMAIL]:
@@ -73,6 +72,10 @@ def __check_token_expired(token):
     return past < present
 
 
+def logout():
+    session.pop(SESSION_USER_TOKEN, None)
+
+
 def handle_login(email, password):
     if SESSION_USER_TOKEN in session:
         return render_template('welcome.html')
@@ -85,7 +88,6 @@ def handle_login(email, password):
         session[SESSION_USER_TOKEN] = token
         session[SESSION_USER_EMAIL] = email
         print(f'encoded:{token}')
-        # return jsonify({'token': token.decode('utf-8')})
-        return jsonify({'token': token})
+        return redirect(url_for('product.product'))
     else:
         return make_response('Unable to verify', 408, {'WWW-Authenticate': 'Basic realm: "Authentication Failed "'})

@@ -1,5 +1,6 @@
 FROM python:3.8-slim-buster
 
+VOLUME /src/instance
 WORKDIR /src
 
 COPY src/requirements.txt requirements.txt

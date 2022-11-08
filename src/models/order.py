@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 import datetime
+import sqlite3
 from flask import jsonify, make_response
-from sqlalchemy import DateTime
-
+from sqlalchemy import DateTime, engine_from_config
+from sqlalchemy.sql import expression
 from src.models.user import User
 from .. import db
 from .product import Product
@@ -35,6 +36,8 @@ class Order(db.Model):
     products = db.relationship(
         'Product', secondary=order_product, backref='orders')
     reg_date = db.Column(DateTime, default=datetime.datetime.utcnow)
+    bought = db.Column(
+        db.Boolean, server_default=expression.true(), nullable=False)
 
     def to_json(self):
         return {
@@ -61,14 +64,9 @@ class Order(db.Model):
         new_order = Order(user_id)
 
         for p in products_ids:
-
-            # product = db.session.query(Product).get(int(p))
             product = db.session.query(Product).get(p)
             new_order.products.append(product)
-            print(f'product:{product}')
-            print(f'new_order:{new_order}')
             db.session.add(product)
-        print(f'new_order:{new_order}')
 
         db.session.add(new_order)
         db.session.commit()
@@ -131,3 +129,8 @@ class Order(db.Model):
     #         db.session.rollback()
     #     finally:
     #         return jsonify([product.to_json() for product in products])
+
+    @staticmethod
+    def drop(engine):
+        order_product.drop(engine)
+        Order.__table__.drop(engine)

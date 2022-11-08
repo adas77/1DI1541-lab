@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 from src.models.user import User
-from ..models.security.jwt import handle_login, token_required
+from ..models.security.jwt import handle_login, token_required, logout
 import os
 
 API_USER_LOGIN = os.getenv('API_USER_LOGIN')
@@ -64,4 +64,11 @@ def api_user_delete_by_id(id=None):
 @bp.route("/")
 @token_required
 def root():
-    return render_template('product.html')
+    return redirect(url_for('product.product'))
+
+
+@bp.route("/logout")
+@token_required
+def user_logout():
+    logout()
+    return render_template('login.html')

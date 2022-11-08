@@ -1,7 +1,11 @@
+import os
 from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
+import sqlalchemy
 
 db = SQLAlchemy()
+
+SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
 
 
 def init_app():
@@ -16,6 +20,7 @@ def init_app():
         from src.models.user import User
         from src.models.product import Product
         from src.models.order import Order
+
         db.create_all()
 
         from src.routes.user import bp as user_bp
