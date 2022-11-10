@@ -10,7 +10,7 @@ search = (val) => {
             console.log(p)
 
             const img = `<img
-        src="static/${p.img}"
+        src="static/img/${p.img}"
         alt="${p.img}"
         width="80"
         height="70"
@@ -49,7 +49,7 @@ const getQuantity = (quantity, product_id, price) => {
             const product = products.get(key);
 
             const img = `<img
-        src="static/${product.img}"
+        src="static/img/${product.img}"
         alt="${product.img}"
         width="400"
         height="341"
@@ -87,7 +87,7 @@ window.addEventListener('load', () => {
 
 
                 const img = `<img
-        src="static/${u.img}"
+        src="static/img/${u.img}"
         alt="${u.img}"
         width="400"
         height="341"
