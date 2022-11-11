@@ -82,6 +82,8 @@ input[type="email"], input[type="password"], input[type="text"], input[type="num
     touch-action: manipulation;
 }
 
+
+
 input[type="button"]:hover, input[type="submit"]:hover {
     box-shadow: rgba(80, 63, 205, 0.5) 0 1px 30px;
     transition-duration: .1s;

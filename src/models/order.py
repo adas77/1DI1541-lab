@@ -104,6 +104,22 @@ class Order(db.Model):
             db.session.rollback()
         finally:
             return orders
+
+    @staticmethod
+    def get_by_user_id(user_id):
+        orders = []
+        try:
+            orders = Order.query.filter_by(user_id=user_id)
+            orders_classified = {}
+            for o in orders:
+                orders_classified[o.order_id] = o
+                # todo: fixme
+
+            db.session.commit()
+        except:
+            db.session.rollback()
+        finally:
+            return orders_classified
     # @staticmethod
     # def delete_by_id(id):
     #     if type(id) is not int:

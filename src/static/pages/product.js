@@ -2,16 +2,11 @@ const products = new Map()
 const basket = new Map()
 
 window.addEventListener('load', () => {
-    // basket.forEach(b => {
-    //     console.log(b)
-    // })
-
     fetch('/api/product/get')
         .then((response) => response.json())
         .then((data) => {
             data.forEach((u) => {
                 products.set(u.product_id, { img: u.img, price: u.price, quantity: u.quantity })
-                // console.log(products)
                 const img = `<img
         src="static/img/${u.img}"
         alt="${u.img}"
@@ -19,8 +14,6 @@ window.addEventListener('load', () => {
         width="400"
         height="341"
         title="${u.img}" />`
-
-                //<img src="{{ url_for('static', filename = 'japko.jpg') }}" align="middle" />
                 const l = ` <tr>
               <td>${u.product_id}</td>
               <td>${img}</td>
@@ -35,8 +28,6 @@ window.addEventListener('load', () => {
         })
         .catch((err) => console.log(err))
 })
-
-
 
 const search = (val) => {
     const searchDiv = document.getElementById('search')
@@ -57,12 +48,10 @@ const search = (val) => {
             searchDiv.insertAdjacentHTML('afterbegin', img)
         }
     });
-
 }
 
 const handleButton = ($this) => {
     letval = $this.previousElementSibling.value;
-
     console.log("button pressed")
     if (val == '') {
         console.log('no input');
@@ -78,15 +67,10 @@ const getQuantity = (quantity, product_id, price) => {
         while (basketDiv.firstChild) {
             basketDiv.removeChild(basketDiv.firstChild);
         }
-
         basket.set(product_id, quantity)
-        //const product = products.get(product_id);
-        //console.log(`product:${product.}`)
-
         let sum = 0;
         basket.forEach((value, key) => {
             const product = products.get(key);
-
             const img = `<img
         src="static/img/${product.img}"
         alt="${product.img}"
@@ -107,7 +91,6 @@ const getQuantity = (quantity, product_id, price) => {
         })
         basketSumDiv.innerHTML = sum
     }
-
 }
 
 const deleteProduct = (key) => {
@@ -115,7 +98,6 @@ const deleteProduct = (key) => {
     console.log(basket)
     basket.delete(key)
     console.log(basket)
-
 }
 
 const makeOrder = async () => {
@@ -142,13 +124,6 @@ const makeOrder = async () => {
     ${p}
 ]
   }`,
-
-        //   body: `{
-        //     "user_id": ${1},
-        //     "products_ids": [
-        //      ${p}
-        //  ]
-        //    }`,
     });
 
     response.json().then(data => {

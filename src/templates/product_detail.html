@@ -10,12 +10,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/main.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/product_detail.css') }}" />
     <script src="{{ url_for('static', filename = 'components/nav.js') }}" type="text/javascript" defer></script>
-    <script src="{{ url_for('static', filename = 'pages/product_detail.js') }}" type="text/javascript" defer></script>
   </head>
 
   <body>
     <nav-component></nav-component>
-    <img src="{{ img_url }}" alt="{{ img }}" class="center-img" />
+    <img src="{{ img_url }}" alt="{{ img }}" class="center-img" onclick="window.open(this.src)" />
     <p>ID:{{ id }}</p>
     <p>{{ description }}</p>
     <p>PRICE:{{ price }}</p>

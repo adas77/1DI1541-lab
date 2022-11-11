@@ -7,7 +7,6 @@ get-content .env | ForEach-Object {
 }
 
 # $img = docker images -q ${env:DOCKER_IMAGE_NAME}
-
 # if (-Not $img ) {
 #     docker build --tag ${env:DOCKER_IMAGE_NAME} .
 # }

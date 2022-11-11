@@ -32,12 +32,18 @@ bp = Blueprint('order', __name__)
 #         return products
 
 
-@bp.route("/api/order"+"/<int:bought>", methods=["GET"])
-def api_product_get_bought(bought=None):
-    if bought is not None:
-        logic = False if bought <= 0 else True
-        return Order.get_by_bought(logic)
+# @bp.route("/api/order"+"/<int:bought>", methods=["GET"])
+# def api_product_get_bought(bought=None):
+#     if bought is not None:
+#         logic = False if bought <= 0 else True
+#         return Order.get_by_bought(logic)
 
+
+@bp.route("/api/order"+"/<int:user_id>", methods=["GET"])
+def api_product_get_by_user_id(user_id=None):
+    if user_id is not None:
+        orders = Order.get_by_user_id(user_id)
+        return orders
 
 # @bp.route(API_PRODUCT_DELETE+"/<int:id>", methods=["DELETE"])
 # def api_product_delete_by_id(id=None):
