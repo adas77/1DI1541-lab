@@ -1,6 +1,8 @@
-from flask import Blueprint, make_response, render_template, request
+from flask import Blueprint, make_response, render_template, request, session
 from src.models.order import Order
 import os
+
+from src.models.user import User
 
 # API_ORDER_GET = os.getenv('API_ORDER_GET')
 # API_ORDER_CREATE = os.getenv('API_ORDER_CREATE')
@@ -30,17 +32,32 @@ bp = Blueprint('order', __name__)
 #         return products
 
 
+@bp.route("/api/order"+"/<int:bought>", methods=["GET"])
+def api_product_get_bought(bought=None):
+    if bought is not None:
+        logic = False if bought <= 0 else True
+        return Order.get_by_bought(logic)
+
+
+# @bp.route(API_PRODUCT_DELETE+"/<int:id>", methods=["DELETE"])
+# def api_product_delete_by_id(id=None):
+#     if id is not None:
+#         return make_response("Arg to")
+
+
 @bp.route("/api/order/create", methods=["POST", "GET"])
 def api_order_create():
     if request.method == "GET":
         return make_response("aaa")
     print(f'req:{request.get_json()}')
-    user_id = request.get_json()['user_id']
+    # user_id = request.get_json()[1]
+    # user_id = request.get_json()['user_id']
+    user_id = User.get_id_by_email(session['email'])
     products_ids = request.get_json()['products_ids']
     print(user_id)
     print(products_ids)
     print(type(products_ids))
-    order = Order.create(user_id, products_ids)
+    order = Order.create(user_id, products_ids, False)
     return order
 
 
@@ -53,6 +70,3 @@ def api_order_delete():
 # def api_product_delete_by_id(id=None):
 #     if id is not None:
 #         return Order.delete_by_id(id)
-
-
-

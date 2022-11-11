@@ -5,18 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sklep internetowy</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <script>
-      search = (val) => {
-        var t = document.getElementById('t').innerHTML
-        let nextOcc = t.indexOf(val)
-      
-        while (t.indexOf(val, nextOcc) != -1 && val.length > 0) {
-          console.log(`The index of the  "${val}" is ${t.indexOf(val, nextOcc)}`)
-          nextOcc += 1
-        }
-      }
-    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'css/main.css') }}" />
+    <script src="{{ url_for('static', filename = 'pages/search.js') }}" type="text/javascript" defer></script>
   </head>
 
   <body>

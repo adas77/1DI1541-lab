@@ -22,13 +22,13 @@ def init_app():
 
         db.create_all()
 
-        from src.routes.user import bp as user_bp
-        app.register_blueprint(user_bp)
+    from src.routes.user import bp as user_bp
+    app.register_blueprint(user_bp)
 
-        from src.routes.product import bp as product_bp
-        app.register_blueprint(product_bp)
+    from src.routes.product import bp as product_bp
+    app.register_blueprint(product_bp)
 
-        from src.routes.order import bp as order_bp
-        app.register_blueprint(order_bp)
+    from src.routes.order import bp as order_bp
+    app.register_blueprint(order_bp)
 
-        return app
+    return app

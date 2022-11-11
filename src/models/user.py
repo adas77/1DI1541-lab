@@ -129,6 +129,18 @@ class User(db.Model):
             return make_response("Error", RESPONSE_OK_DELETED)
 
     @staticmethod
+    def get_id_by_email(email):
+        if not email:
+            return make_response("Error", RESPONSE_ERROR_WRONG_ARGUMENT)
+
+        try:
+            user_by_email = User.query.filter_by(email=email).first()
+            id = user_by_email.user_id
+        except:
+            db.session.rollback()
+        return id
+
+    @staticmethod
     def delete_all():
         num_rows_deleted = 0
         try:

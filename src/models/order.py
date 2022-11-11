@@ -2,7 +2,9 @@ from dataclasses import dataclass
 import datetime
 import sqlite3
 from flask import jsonify, make_response
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import DateTime, engine_from_config
+import sqlalchemy
 from sqlalchemy.sql import expression
 from src.models.user import User
 from .. import db
@@ -47,8 +49,9 @@ class Order(db.Model):
             'reg_date': self.reg_date
         }
 
-    def __init__(self, user_id: int):
+    def __init__(self, user_id: int, bought=True):
         self.user_id = user_id
+        self.bought = bought
 
     @staticmethod
     def __check_not_empty():
@@ -56,12 +59,13 @@ class Order(db.Model):
         return True
 
     @staticmethod
-    def create(user_id, products_ids):
+    def create(user_id, products_ids, bought):
 
         if db.session.query(User).get(user_id) is None:
             return make_response(f'User with id={user_id} does not exists', RESPONSE_DOES_NOT_EXIST)
 
-        new_order = Order(user_id)
+        new_order = Order(user_id, bought)
+        # new_order.bought = bought
 
         for p in products_ids:
             product = db.session.query(Product).get(p)
@@ -90,6 +94,16 @@ class Order(db.Model):
                 return make_response(
                     f"Order with id={id} does not exists", RESPONSE_ERROR_WRONG_ARGUMENT)
 
+    @staticmethod
+    def get_by_bought(bought):
+        orders = []
+        try:
+            orders = User.query.filter_by(bought=bought)
+            db.session.commit()
+        except:
+            db.session.rollback()
+        finally:
+            return orders
     # @staticmethod
     # def delete_by_id(id):
     #     if type(id) is not int:
@@ -130,7 +144,12 @@ class Order(db.Model):
     #     finally:
     #         return jsonify([product.to_json() for product in products])
 
-    @staticmethod
-    def drop(engine):
-        order_product.drop(engine)
-        Order.__table__.drop(engine)
+    # @staticmethod
+    # def drop():
+
+    #     # order_product.drop(engine)
+    #     # Order.__table__.drop(engine)
+
+    #     engine = sqlalchemy.create_engine('sqlite:///instance/shop.db')
+    #     Order.__table__.drop()
+    #     order_product.__table__.drop()

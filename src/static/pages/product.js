@@ -1,17 +1,56 @@
 const products = new Map()
 const basket = new Map()
-search = (val) => {
+
+window.addEventListener('load', () => {
+    // basket.forEach(b => {
+    //     console.log(b)
+    // })
+
+    fetch('/api/product/get')
+        .then((response) => response.json())
+        .then((data) => {
+            data.forEach((u) => {
+                products.set(u.product_id, { img: u.img, price: u.price, quantity: u.quantity })
+                // console.log(products)
+                const img = `<img
+        src="static/img/${u.img}"
+        alt="${u.img}"
+        onClick="imageClicked(${u.product_id})"
+        width="400"
+        height="341"
+        title="${u.img}" />`
+
+                //<img src="{{ url_for('static', filename = 'japko.jpg') }}" align="middle" />
+                const l = ` <tr>
+              <td>${u.product_id}</td>
+              <td>${img}</td>
+              <td>${u.price}ZŁ/KG</td>
+              <td>${u.quantity}</td>
+              <td>${u.description}</td>
+              <td>${u.reg_date}</td>
+              <td><input  onkeydown="getQuantity(this.value,${u.product_id},${u.price})" type="number" placeholder="sztuk" value=0></td>
+            </tr>`
+                document.querySelector('table').insertAdjacentHTML('beforeend', l)
+            })
+        })
+        .catch((err) => console.log(err))
+})
+
+
+
+const search = (val) => {
     const searchDiv = document.getElementById('search')
     while (searchDiv.firstChild) {
         searchDiv.removeChild(searchDiv.firstChild);
     }
-    products.forEach(p => {
+    products.forEach((p, key) => {
         if (p.img.includes(val) && val.length > 0) {
             console.log(p)
 
             const img = `<img
         src="static/img/${p.img}"
         alt="${p.img}"
+        onClick="imageClicked(${key})"
         width="80"
         height="70"
         title="${p.img}" />`
@@ -60,7 +99,7 @@ const getQuantity = (quantity, product_id, price) => {
           <td>${value}</td>
           <td>${product.price}</td>
           <td>${img}</td>
-          <td><button onclick="delete(this)">usun</button></td>
+          <td><button onclick="deleteProduct(${key})">usun</button></td>
         </tr>`
 
             basketDiv.insertAdjacentHTML('beforeend', be)
@@ -71,41 +110,54 @@ const getQuantity = (quantity, product_id, price) => {
 
 }
 
-window.addEventListener('load', () => {
+const deleteProduct = (key) => {
+    console.log("fff")
+    console.log(basket)
+    basket.delete(key)
+    console.log(basket)
 
-    basket.forEach(b => {
-        console.log(b)
+}
+
+const makeOrder = async () => {
+    let p = "";
+    basket.forEach((quantity, p_id) => {
+
+        console.log(p_id)
+        if (p) {
+            p = p.concat(', ', p_id)
+        }
+        else {
+            p = p.concat(p_id)
+        }
     })
 
-    fetch('/api/product/get')
-        .then((response) => response.json())
-        .then((data) => {
-            data.forEach((u) => {
-                products.set(u.product_id, { img: u.img, price: u.price, quantity: u.quantity })
-                //products.push({img:u.img,price:u.price,quantity:u.quantity})
-                console.log(products)
+    const response = await fetch("api/order/create", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: `{
+   "products_ids": [
+    ${p}
+]
+  }`,
+
+        //   body: `{
+        //     "user_id": ${1},
+        //     "products_ids": [
+        //      ${p}
+        //  ]
+        //    }`,
+    });
+
+    response.json().then(data => {
+        console.log(data);
+    });
+}
+
+const imageClicked = (product_id) => {
+    window.open(`/api/product/get/${product_id}`)
+}
 
 
-                const img = `<img
-        src="static/img/${u.img}"
-        alt="${u.img}"
-        width="400"
-        height="341"
-        title="${u.img}" />`
-
-                //<img src="{{ url_for('static', filename = 'japko.jpg') }}" align="middle" />
-                const l = ` <tr>
-              <td>${u.product_id}</td>
-              <td>${img}</td>
-              <td>${u.price}ZŁ/KG</td>
-              <td>${u.quantity}</td>
-              <td>${u.description}</td>
-              <td>${u.reg_date}</td>
-              <td><button onclick="handleButton(this)">dodaj do koszyka</button></td>
-              <td><input  onkeydown="getQuantity(this.value,${u.product_id},${u.price})" type="number" placeholder="sztuk" value=0></td>
-            </tr>`
-                document.querySelector('table').insertAdjacentHTML('beforeend', l)
-            })
-        })
-        .catch((err) => console.log(err))
-})
