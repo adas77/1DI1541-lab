@@ -1,18 +1,25 @@
 <!DOCTYPE html>
-
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sklep internetowy</title>
+    <title>Product</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename = 'img/favicon.ico') }}" />
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/main.css') }}" />
     <script src="{{ url_for('static', filename = 'components/nav.js') }}" type="text/javascript" defer></script>
   </head>
-
   <body>
     <nav-component></nav-component>
+    <b>USER_ID:{{ user_id }}</b><br /><br /><br />
+
+    {% for key, value in orders.items() %}
+      <b>ORDER_ID:</b> {{ key[0] }}<br /><b>ORDER_DATE:</b> {{ key[1] }}<br /> {% for v in value %}
+        {{ v.product_id }}
+        <img src="{{ url_for('static', filename = 'img/' + v['img']) }}" alt="v['img']" width="80" height="80" />
+        {{ v.price }}ZŁ
+        <br /><br />
+      {% endfor %}<br /><br /><br />
+    {% endfor %}
   </body>
 </html>

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import datetime
+import json
 import sqlite3
 from flask import jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
@@ -66,6 +67,7 @@ class Order(db.Model):
 
         new_order = Order(user_id, bought)
         # new_order.bought = bought
+        # todo: quantity
 
         for p in products_ids:
             product = db.session.query(Product).get(p)
@@ -107,13 +109,30 @@ class Order(db.Model):
 
     @staticmethod
     def get_by_user_id(user_id):
-        orders = []
+        orders_classified = {}
         try:
             orders = Order.query.filter_by(user_id=user_id)
             orders_classified = {}
+
             for o in orders:
-                orders_classified[o.order_id] = o
-                # todo: fixme
+                ps = []
+                for p in o.products:
+                    ps.append(p.to_json())
+                orders_classified[(o.order_id,o.reg_date)] = ps
+
+                # (
+                # str(p.to_json()) for p in o.products)
+
+        # jsonString = json.dumps(orders_classified, indent=4)
+        # print(jsonString)
+        # print(orders_classified)
+
+        # for o in orders:
+        #     print(f'ORDER:{o.order_id}')
+        #     for p in o.products:
+        #         print(f'PRODUCT:{p.product_id}')
+
+        # todo: fixme
 
             db.session.commit()
         except:

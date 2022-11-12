@@ -21,7 +21,7 @@ window.addEventListener('load', () => {
               <td>${u.quantity}</td>
               <td>${u.description}</td>
               <td>${u.reg_date}</td>
-              <td><input  onkeydown="getQuantity(this.value,${u.product_id},${u.price})" type="number" placeholder="sztuk" value=0></td>
+              <td><input id="product-${u.product_id}"  onkeydown="getQuantity(this,${u.product_id},${u.price})" type="number" placeholder="sztuk" ></td>
             </tr>`
                 document.querySelector('table').insertAdjacentHTML('beforeend', l)
             })
@@ -61,7 +61,9 @@ const handleButton = ($this) => {
 };
 
 const getQuantity = (quantity, product_id, price) => {
+    quantity = quantity.value
     if (event.key === "Enter" && quantity > 0) {
+        document.getElementById(`product-${product_id}`).value = '';
         const basketDiv = document.getElementById('basket')
         const basketSumDiv = document.getElementById('basket-sum')
         while (basketDiv.firstChild) {
@@ -75,7 +77,7 @@ const getQuantity = (quantity, product_id, price) => {
         src="static/img/${product.img}"
         alt="${product.img}"
         width="400"
-        height="341"
+        height="340"
         title="${product.img}" />`
 
             const be = ` <tr>
@@ -101,6 +103,7 @@ const deleteProduct = (key) => {
 }
 
 const makeOrder = async () => {
+    if (basket.size <= 0) { return }
     let p = "";
     basket.forEach((quantity, p_id) => {
 
@@ -125,14 +128,16 @@ const makeOrder = async () => {
 ]
   }`,
     });
-
-    response.json().then(data => {
+    response.json().then((data) => {
         console.log(data);
+        let sum = document.getElementById('basket-sum').innerHTML
+        alert(`Your Order:\nid=${data.order_id}\nproducts=${p}\nprice:${sum}`);
+        window.open(`/order`)
     });
-}
 
+}
 const imageClicked = (product_id) => {
-    window.open(`/api/product/get/${product_id}`)
+    window.open(`/api/product/get/${product_id}ZŁ`)
 }
 
 

@@ -56,6 +56,9 @@ class Nav extends HTMLElement {
           <a href="/product">Produkty</a>
         </li>
         <li>
+          <a href="order">Orders</a>
+        </li>
+        <li>
           <a href="https://isod.ee.pw.edu.pl/">ISOD</a>
         </li>
         <li>
