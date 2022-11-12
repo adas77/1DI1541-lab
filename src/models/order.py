@@ -85,9 +85,17 @@ class Order(db.Model):
         return None
 
     @staticmethod
-    def __dec_quantity(order):
-        for p in order.products:
-            p.product.quantity -= p.quantity_b
+    def __dec_quantity(db, order_id):
+        o = Order.query.get(order_id)
+
+        for p in o.products:
+            product_id = p.product.product_id
+            pr = Product.query.get(product_id)
+            print("gsoinesoig")
+            print(pr.quantity)
+            print(p.quantity_b)
+            setattr(pr, 'quantity', pr.quantity - p.quantity_b)
+        db.session.commit()
 
     # naive dec
             # p.product.quantity -= p.quantity_b
@@ -112,7 +120,7 @@ class Order(db.Model):
 
         db.session.commit()
         inserted_order = Order.get_by_id(new_order.order_id)
-        Order.__dec_quantity(Order.query.get(new_order.order_id))
+        Order.__dec_quantity(db, new_order.order_id)
         return inserted_order
 
     @staticmethod
