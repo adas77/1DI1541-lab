@@ -12,6 +12,8 @@ API_USER_CHANGE_PASSWORD = os.getenv('API_USER_CHANGE_PASSWORD')
 
 bp = Blueprint('user', __name__)
 
+# todo: change pass template + user info on nav
+
 
 @bp.route(API_USER_GET, methods=["GET"])
 def api_user_get():

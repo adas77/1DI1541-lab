@@ -16,7 +16,7 @@ class Nav extends HTMLElement {
     
     .nav {
       margin: auto;
-      width: 50%;
+      width: 65%;
       text-align: center;
       border: 3px solid green;
       padding: 10px;

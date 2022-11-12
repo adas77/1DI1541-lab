@@ -1,11 +1,7 @@
 from dataclasses import dataclass
 import datetime
-import json
-import sqlite3
 from flask import jsonify, make_response
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import DateTime, engine_from_config
-import sqlalchemy
+from sqlalchemy import DateTime
 from sqlalchemy.sql import expression
 from src.models.user import User
 from .. import db
@@ -66,8 +62,7 @@ class Order(db.Model):
             return make_response(f'User with id={user_id} does not exists', RESPONSE_DOES_NOT_EXIST)
 
         new_order = Order(user_id, bought)
-        # new_order.bought = bought
-        # todo: quantity
+        # todo: add quantity to order, dec quantity after makeOrder (+validate) + ?bought?
 
         for p in products_ids:
             product = db.session.query(Product).get(p)
@@ -118,21 +113,7 @@ class Order(db.Model):
                 ps = []
                 for p in o.products:
                     ps.append(p.to_json())
-                orders_classified[(o.order_id,o.reg_date)] = ps
-
-                # (
-                # str(p.to_json()) for p in o.products)
-
-        # jsonString = json.dumps(orders_classified, indent=4)
-        # print(jsonString)
-        # print(orders_classified)
-
-        # for o in orders:
-        #     print(f'ORDER:{o.order_id}')
-        #     for p in o.products:
-        #         print(f'PRODUCT:{p.product_id}')
-
-        # todo: fixme
+                orders_classified[(o.order_id, o.reg_date)] = ps
 
             db.session.commit()
         except:

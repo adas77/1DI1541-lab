@@ -1,8 +1,8 @@
 const products = new Map()
 const basket = new Map()
 
-window.addEventListener('load', () => {
-    fetch('/api/product/get')
+window.addEventListener('load', async () => {
+    await fetch('/api/product/get')
         .then((response) => response.json())
         .then((data) => {
             data.forEach((u) => {
@@ -36,7 +36,6 @@ const search = (val) => {
     }
     products.forEach((p, key) => {
         if (p.img.includes(val) && val.length > 0) {
-            console.log(p)
 
             const img = `<img
         src="static/img/${p.img}"
@@ -49,16 +48,6 @@ const search = (val) => {
         }
     });
 }
-
-const handleButton = ($this) => {
-    letval = $this.previousElementSibling.value;
-    console.log("button pressed")
-    if (val == '') {
-        console.log('no input');
-    } else {
-        console.log(val);
-    }
-};
 
 const getQuantity = (quantity, product_id, price) => {
     quantity = quantity.value
@@ -96,10 +85,7 @@ const getQuantity = (quantity, product_id, price) => {
 }
 
 const deleteProduct = (key) => {
-    console.log("fff")
-    console.log(basket)
     basket.delete(key)
-    console.log(basket)
 }
 
 const makeOrder = async () => {
@@ -139,5 +125,3 @@ const makeOrder = async () => {
 const imageClicked = (product_id) => {
     window.open(`/api/product/get/${product_id}ZŁ`)
 }
-
-
