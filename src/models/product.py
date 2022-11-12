@@ -71,7 +71,7 @@ class Product(db.Model):
             db.session.rollback()
         finally:
             if product is not None:
-                return jsonify(product.to_json())
+                return product.to_json()
             else:
                 return make_response(
                     f"Product with id={id} does not exists", RESPONSE_ERROR_WRONG_ARGUMENT)

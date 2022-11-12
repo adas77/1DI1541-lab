@@ -80,7 +80,7 @@ const getQuantity = (quantity, product_id, price) => {
             basketDiv.insertAdjacentHTML('beforeend', be)
             sum += product.price * value
         })
-        basketSumDiv.innerHTML = sum
+        basketSumDiv.innerHTML = sum.toFixed(2)
     }
 }
 
@@ -91,14 +91,22 @@ const deleteProduct = (key) => {
 const makeOrder = async () => {
     if (basket.size <= 0) { return }
     let p = "";
+    let q = "";
     basket.forEach((quantity, p_id) => {
 
-        console.log(p_id)
         if (p) {
             p = p.concat(', ', p_id)
         }
         else {
             p = p.concat(p_id)
+        }
+
+
+        if (q) {
+            q = q.concat(', ', quantity)
+        }
+        else {
+            q = q.concat(quantity)
         }
     })
 
@@ -111,7 +119,10 @@ const makeOrder = async () => {
         body: `{
    "products_ids": [
     ${p}
-]
+],
+    "quantities":[
+    ${q}
+    ]
   }`,
     });
     response.json().then((data) => {

@@ -103,9 +103,20 @@ li {
     cursor: pointer
 }
 
+
 img {
-    cursor: pointer
+    padding: 2px;
+    background-image: linear-gradient(92.88deg, #2b9e40 9.16%, #1fdb11 43.89%, #0d863f 64.72%);
+    cursor: pointer;
+    transition: transform .2s;
+    margin: 0 auto;
 }
+
+img:hover {
+    transform: scale(1.15);
+}
+
+
 
 .center {
     position: absolute;

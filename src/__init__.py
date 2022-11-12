@@ -19,9 +19,10 @@ def init_app():
         from src.models.user import User
         from src.models.product import Product
         from src.models.order import Order
-
         db.create_all()
 
+    # Order.drop()
+    
     from src.routes.user import bp as user_bp
     app.register_blueprint(user_bp)
 

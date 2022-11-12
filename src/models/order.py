@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import datetime
 from flask import jsonify, make_response
 from sqlalchemy import DateTime
+import sqlalchemy
 from sqlalchemy.sql import expression
 from src.models.user import User
 from .. import db
@@ -17,13 +18,22 @@ RESPONSE_OK_NOT_DELETED = os.getenv('RESPONSE_OK_NOT_DELETED')
 RESPONSE_DOES_NOT_EXIST = os.getenv('RESPONSE_DOES_NOT_EXIST')
 
 
-order_product = db.Table('order_product',
-                         db.Column('product_id', db.Integer,
-                                   db.ForeignKey('products.product_id')),
-                         db.Column('order_id', db.Integer,
-                                   db.ForeignKey('orders.order_id'))
-                         )
+# order_product = db.Table('order_product',
+#                          db.Column('product_id', db.Integer,
+#                                    db.ForeignKey('products.product_id')),
+#                          db.Column('order_id', db.Integer,
+#                                    db.ForeignKey('orders.order_id'))
+#  )
 #  ,db.Column('quantity', db.Integer)
+
+
+class OrderProduct(db.Model):
+    __tablename__ = "order_product"
+    order_id = db.Column(db.ForeignKey("orders.order_id"), primary_key=True)
+    product_id = db.Column(db.ForeignKey(
+        "products.product_id"), primary_key=True)
+    quantity_b = db.Column(db.Integer)
+    product = db.relationship("Product")
 
 
 @dataclass
@@ -32,8 +42,7 @@ class Order(db.Model):
     order_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(
         "users.user_id"), nullable=False)
-    products = db.relationship(
-        'Product', secondary=order_product, backref='orders')
+    products = db.relationship('OrderProduct')
     reg_date = db.Column(DateTime, default=datetime.datetime.utcnow)
     bought = db.Column(
         db.Boolean, server_default=expression.true(), nullable=False)
@@ -43,6 +52,15 @@ class Order(db.Model):
             'order_id': self.order_id,
             'user_id': self.user_id,
             # 'products': ''.join([product for product in self.products]),
+            'reg_date': self.reg_date
+        }
+
+    def to_detail_json(self):
+        return {
+            'order_id': self.order_id,
+            'user_id': self.user_id,
+            'products': ''.join([product for product in self.products]),
+            'quantities': ''.join([product for product in self.products]),
             'reg_date': self.reg_date
         }
 
@@ -56,22 +74,45 @@ class Order(db.Model):
         return True
 
     @staticmethod
-    def create(user_id, products_ids, bought):
+    def __check_quantity(products_ids, quantities):
+        if len(products_ids) != len(quantities) or len(products_ids) < 1:
+            return "Wroing params"
+        for i in range(len(products_ids)):
+            p = Product.get_by_id(products_ids[i])
+            print(f'TTTTTTTTT:{p}')
+            if p['quantity'] < quantities[i]:
+                return "Too much quantity"
+        return None
 
+    @staticmethod
+    def __dec_quantity(order):
+        for p in order.products:
+            p.product.quantity -= p.quantity_b
+
+    # naive dec
+            # p.product.quantity -= p.quantity_b
+            #
+
+    @staticmethod
+    def create(user_id, products_ids, quantities, bought):
+        chech_quantities = Order.__check_quantity(products_ids, quantities)
+        if chech_quantities is not None:
+            return make_response(chech_quantities, RESPONSE_ERROR_WRONG_ARGUMENT)
         if db.session.query(User).get(user_id) is None:
             return make_response(f'User with id={user_id} does not exists', RESPONSE_DOES_NOT_EXIST)
 
         new_order = Order(user_id, bought)
+        for i in range(len(products_ids)):
+            a = OrderProduct(quantity_b=quantities[i])
+            a.product = db.session.query(Product).get(products_ids[i])
+            new_order.products.append(a)
+        db.session.add(new_order)
+
         # todo: add quantity to order, dec quantity after makeOrder (+validate) + ?bought?
 
-        for p in products_ids:
-            product = db.session.query(Product).get(p)
-            new_order.products.append(product)
-            db.session.add(product)
-
-        db.session.add(new_order)
         db.session.commit()
         inserted_order = Order.get_by_id(new_order.order_id)
+        Order.__dec_quantity(Order.query.get(new_order.order_id))
         return inserted_order
 
     @staticmethod
@@ -107,12 +148,16 @@ class Order(db.Model):
         orders_classified = {}
         try:
             orders = Order.query.filter_by(user_id=user_id)
-            orders_classified = {}
-
             for o in orders:
                 ps = []
                 for p in o.products:
-                    ps.append(p.to_json())
+                    json = p.product.to_json()
+                    json['quantity'] = p.quantity_b
+                    ps.append(json)
+                    print("JDD")
+                    print(p.product.quantity)
+                    print(p.quantity_b)
+
                 orders_classified[(o.order_id, o.reg_date)] = ps
 
             db.session.commit()
@@ -144,7 +189,7 @@ class Order(db.Model):
         try:
             num_rows_deleted += db.session.query(Order).delete()
             num_rows_deleted_relation += db.session.query(
-                order_product).delete()
+                OrderProduct).delete()
             db.session.commit()
         except:
             db.session.rollback()
@@ -160,12 +205,12 @@ class Order(db.Model):
     #     finally:
     #         return jsonify([product.to_json() for product in products])
 
-    # @staticmethod
-    # def drop():
+    @staticmethod
+    def drop():
 
-    #     # order_product.drop(engine)
-    #     # Order.__table__.drop(engine)
+        # order_product.drop(engine)
+        # Order.__table__.drop(engine)
 
-    #     engine = sqlalchemy.create_engine('sqlite:///instance/shop.db')
-    #     Order.__table__.drop()
-    #     order_product.__table__.drop()
+        engine = sqlalchemy.create_engine('sqlite:///instance/shop.db')
+        Order.__table__.drop(engine)
+        OrderProduct.__table__.drop(engine)

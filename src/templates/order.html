@@ -15,7 +15,8 @@
 
     {% for key, value in orders.items() %}
       <b>ORDER_ID:</b> {{ key[0] }}<br /><b>ORDER_DATE:</b> {{ key[1] }}<br /> {% for v in value %}
-        {{ v.product_id }}
+        {{ v.product_id }} <br />
+        <b>QUANTITY:</b>{{ v.quantity }}
         <img src="{{ url_for('static', filename = 'img/' + v['img']) }}" alt="v['img']" width="80" height="80" />
         {{ v.price }}ZŁ
         <br /><br />

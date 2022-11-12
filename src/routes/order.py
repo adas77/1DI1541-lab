@@ -55,6 +55,7 @@ bp = Blueprint('order', __name__)
 def api_product_get_by_user_id():
     id = User.get_id_by_email(session['email'])
     orders = Order.get_by_user_id(id)
+    print(f'hahaha{orders}')
     if request.method == "GET":
         return render_template("order.html", user_id=id, orders=orders, len=len(orders))
 
@@ -68,6 +69,7 @@ def api_product_get_by_user_id():
 
 
 @bp.route("/api/order/create", methods=["POST", "GET"])
+@token_required
 def api_order_create():
     if request.method == "GET":
         return make_response("aaa")
@@ -76,10 +78,11 @@ def api_order_create():
     # user_id = request.get_json()['user_id']
     user_id = User.get_id_by_email(session['email'])
     products_ids = request.get_json()['products_ids']
+    quantities = request.get_json()['quantities']
     print(user_id)
     print(products_ids)
     print(type(products_ids))
-    order = Order.create(user_id, products_ids, False)
+    order = Order.create(user_id, products_ids, quantities, False)
     return order
 
 
