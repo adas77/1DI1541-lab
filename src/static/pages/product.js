@@ -123,5 +123,5 @@ const makeOrder = async () => {
 
 }
 const imageClicked = (product_id) => {
-    window.open(`/api/product/get/${product_id}ZŁ`)
+    window.open(`/api/product/get/${product_id}`)
 }
