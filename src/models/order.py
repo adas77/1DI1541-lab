@@ -18,15 +18,6 @@ RESPONSE_OK_NOT_DELETED = os.getenv('RESPONSE_OK_NOT_DELETED')
 RESPONSE_DOES_NOT_EXIST = os.getenv('RESPONSE_DOES_NOT_EXIST')
 
 
-# order_product = db.Table('order_product',
-#                          db.Column('product_id', db.Integer,
-#                                    db.ForeignKey('products.product_id')),
-#                          db.Column('order_id', db.Integer,
-#                                    db.ForeignKey('orders.order_id'))
-#  )
-#  ,db.Column('quantity', db.Integer)
-
-
 class OrderProduct(db.Model):
     __tablename__ = "order_product"
     order_id = db.Column(db.ForeignKey("orders.order_id"), primary_key=True)
@@ -51,7 +42,6 @@ class Order(db.Model):
         return {
             'order_id': self.order_id,
             'user_id': self.user_id,
-            # 'products': ''.join([product for product in self.products]),
             'reg_date': self.reg_date
         }
 
@@ -79,7 +69,6 @@ class Order(db.Model):
             return "Wroing params"
         for i in range(len(products_ids)):
             p = Product.get_by_id(products_ids[i])
-            print(f'TTTTTTTTT:{p}')
             if p['quantity'] < quantities[i]:
                 return "Too much quantity"
         return None
@@ -91,15 +80,8 @@ class Order(db.Model):
         for p in o.products:
             product_id = p.product.product_id
             pr = Product.query.get(product_id)
-            print("gsoinesoig")
-            print(pr.quantity)
-            print(p.quantity_b)
             setattr(pr, 'quantity', pr.quantity - p.quantity_b)
         db.session.commit()
-
-    # naive dec
-            # p.product.quantity -= p.quantity_b
-            #
 
     @staticmethod
     def create(user_id, products_ids, quantities, bought):
@@ -116,7 +98,7 @@ class Order(db.Model):
             new_order.products.append(a)
         db.session.add(new_order)
 
-        # todo: add quantity to order, dec quantity after makeOrder (+validate) + ?bought?
+        # todo: ?bought? basket -> db
 
         db.session.commit()
         inserted_order = Order.get_by_id(new_order.order_id)
@@ -162,12 +144,7 @@ class Order(db.Model):
                     json = p.product.to_json()
                     json['quantity'] = p.quantity_b
                     ps.append(json)
-                    print("JDD")
-                    print(p.product.quantity)
-                    print(p.quantity_b)
-
                 orders_classified[(o.order_id, o.reg_date)] = ps
-
             db.session.commit()
         except:
             db.session.rollback()
@@ -215,10 +192,6 @@ class Order(db.Model):
 
     @staticmethod
     def drop():
-
-        # order_product.drop(engine)
-        # Order.__table__.drop(engine)
-
         engine = sqlalchemy.create_engine('sqlite:///instance/shop.db')
         Order.__table__.drop(engine)
         OrderProduct.__table__.drop(engine)

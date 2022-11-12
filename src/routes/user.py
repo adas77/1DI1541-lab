@@ -43,11 +43,9 @@ def api_user_create():
 def api_user_login():
     if request.method == "GET":
         return render_template("login.html")
-    # nickname = request.form['nickname']
     email = request.form['email']
     password = request.form['password']
     return handle_login(email, password)
-    # return user
 
 
 @bp.route(API_USER_DELETE, methods=["DELETE"])
