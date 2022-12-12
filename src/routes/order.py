@@ -37,6 +37,8 @@ def api_order_create():
     user_id = User.get_id_by_email(session['email'])
     products_ids = request.get_json()['products_ids']
     quantities = request.get_json()['quantities']
+    print(products_ids)
+    print(quantities)
     order = Order.create(user_id, products_ids, quantities, False)
     return order
 

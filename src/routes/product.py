@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request, url_for
 from src.models.product import Product
-from ..models.security.jwt import handle_login, token_required
+from ..models.security.jwt import handle_login, token_required,is_admin
 import os
 
 API_PRODUCT_GET = os.getenv('API_PRODUCT_GET')
@@ -14,7 +14,10 @@ bp = Blueprint('product', __name__)
 @bp.route('/product')
 @token_required
 def product():
-    return render_template('product.html')
+    if is_admin():
+        return render_template('admin/super_product.html')
+    else:
+        return render_template('product.html')
 
 
 @bp.route(API_PRODUCT_GET, methods=["GET"])
@@ -35,9 +38,10 @@ def api_product_get_by_id(id=None):
 
 
 @bp.route(API_PRODUCT_CREATE, methods=["POST", "GET"])
+@token_required
 def api_product_create():
     if request.method == "GET":
-        return render_template("admin/create_product.html")
+        return render_template("admin/super_product.html")
     img = request.form['img']
     price = request.form['price']
     description = request.form['description']
@@ -45,13 +49,22 @@ def api_product_create():
     product = Product.create(img, price, quantity, description)
     return product
 
+@bp.route(API_PRODUCT_UPDATE+"/<int:id>", methods=["POST"])
+@token_required
+def api_product_update(id=None):
+    if id is not None:
+        discount = request.get_json()['discount']
+        product = Product.update(id,discount)
+        return product
 
 @bp.route(API_PRODUCT_DELETE, methods=["DELETE"])
+@token_required
 def api_product_delete():
     return Product.delete_all()
 
 
 @bp.route(API_PRODUCT_DELETE+"/<int:id>", methods=["DELETE"])
+@token_required
 def api_product_delete_by_id(id=None):
     if id is not None:
         return Product.delete_by_id(id)

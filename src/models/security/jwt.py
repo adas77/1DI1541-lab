@@ -91,3 +91,14 @@ def handle_login(email, password):
         return redirect(url_for('product.product'))
     else:
         return make_response('Unable to verify', 408, {'WWW-Authenticate': 'Basic realm: "Authentication Failed "'})
+
+
+def is_admin():
+    email = session[SESSION_USER_EMAIL]
+    user = User.get_by_id(User.get_id_by_email(email))
+    is_admin = user.get_json()['is_admin']
+    print(f"is_admin:{is_admin}")
+    if is_admin:
+        return True
+    else:
+        return False

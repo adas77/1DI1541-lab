@@ -18,17 +18,20 @@ window.addEventListener('load', async () => {
               <td>${u.product_id}</td>
               <td>${img}</td>
               <td>${u.price}ZŁ/KG</td>
-              <td>${u.discount}%</td>
+              <td><input id="discount-${u.product_id}" onkeydown="updateDiscount(this, ${u.product_id})" type="number" placeholder=${u.discount}>%</td>
               <td>${u.quantity}</td>
               <td>${u.description}</td>
               <td>${u.reg_date}</td>
-              <td><input id="product-${u.product_id}"  onkeydown="getQuantity(this,${u.product_id},${u.price})" type="number" placeholder="sztuk" ></td>
+              <td><input id="product-${u.product_id}" onkeydown="getQuantity(this,${u.product_id},${u.price})" type="number" placeholder="sztuk" ></td>
+              <button onclick="deleteProductFromDb(${u.product_id})">DEL</button>
             </tr>`
                 document.querySelector('table').insertAdjacentHTML('beforeend', l)
             })
         })
         .catch((err) => console.log(err))
 })
+
+
 
 const search = (val) => {
     const searchDiv = document.getElementById('search')
@@ -136,4 +139,46 @@ const makeOrder = async () => {
 }
 const imageClicked = (product_id) => {
     window.open(`/api/product/get/${product_id}`)
+}
+
+const deleteProductFromDb = async (product_id) => {
+    const response = await fetch(`/api/product/delete/${product_id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+    });
+    response.json().then((data) => {
+        console.log(data);
+        window.location.reload();
+    });
+
+
+}
+
+const updateDiscount = async (val, product_id) => {
+    if (event.key === "Enter") {
+        dis = val.value
+        dis = parseInt(dis)
+        console.log("xd")
+        console.log(dis)
+        console.log(product_id)
+        document.getElementById(`discount-${product_id}`).value = '';
+        const response = await fetch(`api/product/update/${product_id}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: `{
+                "discount": ${dis}
+               }`,
+        });
+        response.json().then((data) => {
+            console.log(data);
+            window.location.reload();
+        });
+    }
+
 }

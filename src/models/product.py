@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 import datetime
-from flask import jsonify, make_response
+from flask import jsonify, make_response, session
 from sqlalchemy import DateTime
+import sqlalchemy
 from .. import db
 # from .security.simplehaszing import *
 import os
@@ -23,6 +24,7 @@ class Product(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String, nullable=False)
     reg_date = db.Column(DateTime, default=datetime.datetime.utcnow)
+    discount = db.Column(db.Integer)
 
     def to_json(self):
         return {
@@ -31,14 +33,16 @@ class Product(db.Model):
             'price': self.price,
             'quantity': self.quantity,
             'description': self.description,
-            'reg_date': self.reg_date
+            'reg_date': self.reg_date,
+            'discount': self.discount
         }
 
-    def __init__(self, img: str, price: float, quantity: int, description: str):
+    def __init__(self, img: str, price: float, quantity: int, description: str, discount: int):
         self.img = img
         self.price = price
         self.quantity = quantity
         self.description = description
+        self.discount=discount
 
     @staticmethod
     def __check_not_empty():
@@ -46,13 +50,13 @@ class Product(db.Model):
         return True
 
     @staticmethod
-    def create(img, price, quantity, description):
+    def create(img, price, quantity, description, discount=0):
 
         # not_empty = Product.__check_not_empty()
         # if not_empty is not True:
         #     return make_response(not_empty, RESPONSE_ERROR_FIELD_EXIST_CODE)
 
-        new_product = Product(img, price, quantity, description)
+        new_product = Product(img, price, quantity, description, discount)
 
         db.session.add(new_product)
         db.session.commit()
@@ -112,3 +116,26 @@ class Product(db.Model):
             db.session.rollback()
         finally:
             return jsonify([product.to_json() for product in products])
+        
+    @staticmethod
+    def update(id, discount):
+        if type(id) is not int:
+            return make_response("ID not numerical", RESPONSE_ERROR_WRONG_ARGUMENT)
+        try:
+            print(discount)
+            pr = Product.query.get(id)
+            setattr(pr, 'discount', discount)
+            db.session.commit()
+            
+            
+
+        except:
+            db.session.rollback()
+        finally:
+            return make_response(
+                f"Product with id={id} updated", 222)
+
+    @staticmethod
+    def drop(engine_name):
+        engine = sqlalchemy.create_engine(engine_name)
+        Product.__table__.drop(engine)

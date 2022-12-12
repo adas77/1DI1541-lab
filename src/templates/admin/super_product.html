@@ -8,10 +8,11 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename = 'img/favicon.ico') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/main.css') }}" />
     <script src="{{ url_for('static', filename = 'components/nav.js') }}" type="text/javascript" defer></script>
-    <script src="{{ url_for('static', filename = 'pages/product.js') }}" type="text/javascript" defer></script>
+    <script src="{{ url_for('static', filename = 'pages/superproduct.js') }}" type="text/javascript" defer></script>
   </head>
   <body>
     <nav-component></nav-component>
+    <p>JESTEŚ W TRYBIE ADMINA</p>
     <input type="text" id="in" oninput="search(this.value)" placeholder="search" />
     <div id="search"></div>
 
@@ -26,17 +27,5 @@
         <th>date</th>
       </tr>
     </table>
-    <p>KOSZYK:</p>
-    <table id="basket">
-      <tr>
-        <th>id</th>
-        <th>quantity</th>
-        <th>price</th>
-        <th>img</th>
-      </tr>
-    </table>
-    <p>KWOTA:</p>
-    <p id="basket-sum"></p>
-    <input type="submit" value="submit-order" onclick="makeOrder()" />
   </body>
 </html>

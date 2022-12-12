@@ -2,8 +2,11 @@ from dataclasses import dataclass
 import datetime
 from flask import jsonify, make_response
 from sqlalchemy import DateTime
+import sqlalchemy
 from .. import db
 from sqlalchemy.sql import func
+from sqlalchemy.sql import expression
+
 from .security.simplehaszing import *
 import os
 
@@ -23,6 +26,7 @@ class User(db.Model):
     email = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.BINARY(16), nullable=False)
     reg_date = db.Column(DateTime, default=datetime.datetime.utcnow)
+    is_admin = db.Column(db.Boolean, nullable=False)
 
     def to_json(self):
         return {
@@ -30,13 +34,15 @@ class User(db.Model):
             'nickname': self.nickname,
             'email': self.email,
             'password': self.password.decode('latin'),
-            'reg_date': self.reg_date
+            'reg_date': self.reg_date,
+            'is_admin': self.is_admin
         }
 
-    def __init__(self, nickname: str, email: str, password: str):
+    def __init__(self, nickname: str, email: str, password: str, is_admin: bool):
         self.nickname = nickname
         self.email = email
         self.password = password
+        self.is_admin = is_admin
 
     @staticmethod
     def __check_unique(nickname, email):
@@ -71,7 +77,7 @@ class User(db.Model):
         return True
 
     @staticmethod
-    def create(nickname, email, password):
+    def create(nickname, email, password, is_admin=False):
 
         unique = User.__check_unique(nickname, email)
         if unique is not True:
@@ -82,8 +88,9 @@ class User(db.Model):
             return make_response(not_empty, RESPONSE_ERROR_FIELD_EXIST_CODE)
 
         SALT = str.encode(os.getenv('SALT'))
+        # SALT = str("zF4sgvAyRj-QIGSMIAouWw==")
         password = hash_new_password(password, SALT)
-        new_user = User(nickname, email, password)
+        new_user = User(nickname, email, password, is_admin)
 
         db.session.add(new_user)
         db.session.commit()
@@ -182,3 +189,8 @@ class User(db.Model):
         except:
             db.session.rollback()
         # finally:
+
+    @staticmethod
+    def drop(engine_name):
+        engine = sqlalchemy.create_engine(engine_name)
+        User.__table__.drop(engine)

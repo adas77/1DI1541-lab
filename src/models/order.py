@@ -191,7 +191,7 @@ class Order(db.Model):
     #         return jsonify([product.to_json() for product in products])
 
     @staticmethod
-    def drop():
-        engine = sqlalchemy.create_engine('sqlite:///instance/shop.db')
+    def drop(engine_name):
+        engine = sqlalchemy.create_engine(engine_name)
         Order.__table__.drop(engine)
         OrderProduct.__table__.drop(engine)
